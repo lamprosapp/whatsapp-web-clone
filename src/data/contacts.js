@@ -30,6 +30,7 @@ async function fetchUsersMessages() {
 	  if (data.length > 0) {
 		console.log(`First user's name: ${data[0].name}`);
 	  }
+	  return data;
 	} catch (error) {
 	  // Handle errors
 	  console.error('Error fetching data:', error);
@@ -37,9 +38,9 @@ async function fetchUsersMessages() {
   }
   
   // Call the function to fetch and process the data
-  fetchUsersMessages();
+
 
   
 
-const users = data;
+const users =   fetchUsersMessages();
 export default users;
