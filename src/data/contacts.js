@@ -24,7 +24,7 @@ async function fetchUsersMessages() {
 	  const data = await response.json();
   
 	  // Process the data as needed
-	  console.log(data);
+	  console.log(data.data);
   
 	  // Example: Accessing the first user's name
 	  if (data.length > 0) {
