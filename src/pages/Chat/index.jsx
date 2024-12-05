@@ -14,7 +14,7 @@ const Chat = ({ match, history }) => {
 	const { users, setUserAsUnread, addNewMessage } = useUsersContext();
 
 	const userId = match.params.id;
-	let user = users.filter((user) => user.id === userId;
+	let user = users.filter((user) => user.id === userId);
 
 	const lastMsgRef = useRef(null);
 	const [showAttach, setShowAttach] = useState(false);
