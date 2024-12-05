@@ -13,8 +13,8 @@ import { useUsersContext } from "context/usersContext";
 const Chat = ({ match, history }) => {
 	const { users, setUserAsUnread, addNewMessage } = useUsersContext();
 
-	const userId = match.params.id;
-	let user = users.find((user) => user.id === userId);
+	const userId = match.params.id; // `id` from the URL (string)
+	let user = users.find((user) => user.id === userId); // Compare as strings
 
 	const lastMsgRef = useRef(null);
 	const [showAttach, setShowAttach] = useState(false);
@@ -24,16 +24,18 @@ const Chat = ({ match, history }) => {
 	const [newMessage, setNewMessage] = useState("");
 
 	useEffect(() => {
+		// Redirect if user not found
 		if (!user) {
 			history.push("/");
 		} else {
 			scrollToLastMsg();
-			setUserAsUnread(user.id);
+			setUserAsUnread(user.id); // Mark the user as unread
 		}
-	}, [user]);
+	}, [user, history, setUserAsUnread]);
 
 	useEffect(() => {
-		if (user && user.messages) {
+		// Scroll to the last message whenever users change
+		if (user) {
 			scrollToLastMsg();
 		}
 	}, [users]);
@@ -43,22 +45,22 @@ const Chat = ({ match, history }) => {
 		setShowProfileSidebar(false);
 		setShowSearchSidebar(false);
 
-		// Call callback fn
+		// Call the callback function to open the new sidebar
 		cb(true);
 	};
 
 	const scrollToLastMsg = () => {
+		// Ensure `lastMsgRef` exists before scrolling
 		if (lastMsgRef.current) {
 			lastMsgRef.current.scrollIntoView();
 		}
 	};
 
 	const submitNewMessage = () => {
-		if (user && newMessage.trim()) {
-			addNewMessage(user.id, newMessage);
-			setNewMessage("");
-			scrollToLastMsg();
-		}
+		// Add a new message for the user and reset the input
+		addNewMessage(user.id, newMessage);
+		setNewMessage("");
+		scrollToLastMsg();
 	};
 
 	return (
@@ -66,20 +68,14 @@ const Chat = ({ match, history }) => {
 			<div className="chat__body">
 				<div className="chat__bg"></div>
 
-				{user && (
-					<Header
-						user={user}
-						openProfileSidebar={() => openSidebar(setShowProfileSidebar)}
-						openSearchSidebar={() => openSidebar(setShowSearchSidebar)}
-					/>
-				)}
-
+				<Header
+					user={user}
+					openProfileSidebar={() => openSidebar(setShowProfileSidebar)}
+					openSearchSidebar={() => openSidebar(setShowSearchSidebar)}
+				/>
 				<div className="chat__content">
-					{user && user.messages && user.messages.length > 0 && (
-						<Convo lastMsgRef={lastMsgRef} messages={user.messages} />
-					)}
+					<Convo lastMsgRef={lastMsgRef} messages={user?.messages || {}} />
 				</div>
-
 				<footer className="chat__footer">
 					<button
 						className="chat__scroll-btn"
@@ -117,7 +113,7 @@ const Chat = ({ match, history }) => {
 				active={showProfileSidebar}
 				closeSidebar={() => setShowProfileSidebar(false)}
 			>
-				{user && <Profile user={user} />}
+				<Profile user={user} />
 			</ChatSidebar>
 		</div>
 	);

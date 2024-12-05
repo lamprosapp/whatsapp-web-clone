@@ -114,44 +114,44 @@ async function mergeFetchedUsers() {
 mergeFetchedUsers();
 
 
-// Function to periodically fetch and update users
-function startPollingForUpdates() {
-  const pollingInterval = 3000; // 3 seconds
+// // Function to periodically fetch and update users
+// function startPollingForUpdates() {
+//   const pollingInterval = 3000; // 3 seconds
 
-  setInterval(async () => {
-    try {
-      console.log("Checking for updates...");
+//   setInterval(async () => {
+//     try {
+//       console.log("Checking for updates...");
 
-      const fetchedUsers = await fetchUsersMessages();
+//       const fetchedUsers = await fetchUsersMessages();
 
-      // Create a map for quick lookup of fetched users by ID
-      const fetchedUsersMap = new Map();
-      fetchedUsers.forEach((user) => {
-        fetchedUsersMap.set(user.id, user);
-      });
+//       // Create a map for quick lookup of fetched users by ID
+//       const fetchedUsersMap = new Map();
+//       fetchedUsers.forEach((user) => {
+//         fetchedUsersMap.set(user.id, user);
+//       });
 
-      // Merge fetched users into the existing users array
-      fetchedUsers.forEach((fetchedUser) => {
-        const existingUserIndex = users.findIndex((user) => user.id === fetchedUser.id);
+//       // Merge fetched users into the existing users array
+//       fetchedUsers.forEach((fetchedUser) => {
+//         const existingUserIndex = users.findIndex((user) => user.id === fetchedUser.id);
 
-        if (existingUserIndex !== -1) {
-          // Perform deep merge with null handling
-          deepMergeWithNullHandling(users[existingUserIndex], fetchedUser);
-        } else {
-          // If the user doesn't exist in dummy data, add them
-          users.push(fetchedUser);
-        }
-      });
+//         if (existingUserIndex !== -1) {
+//           // Perform deep merge with null handling
+//           deepMergeWithNullHandling(users[existingUserIndex], fetchedUser);
+//         } else {
+//           // If the user doesn't exist in dummy data, add them
+//           users.push(fetchedUser);
+//         }
+//       });
 
-      console.log("Users updated:", users);
-    } catch (error) {
-      console.error("Error during polling:", error);
-    }
-  }, pollingInterval);
-}
+//       console.log("Users updated:", users);
+//     } catch (error) {
+//       console.error("Error during polling:", error);
+//     }
+//   }, pollingInterval);
+// }
 
-// Start the polling mechanism
-startPollingForUpdates();
+// // Start the polling mechanism
+// startPollingForUpdates();
 
 
 // Export users as the default export
