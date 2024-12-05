@@ -1,86 +1,90 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import contacts from "data/contacts";
-import { useSocketContext } from "./socketContext";
+import users from "./data/contacts";
 
+// Create Users Context
 const UsersContext = createContext();
 
 const useUsersContext = () => useContext(UsersContext);
 
 const UsersProvider = ({ children }) => {
-	const socket = useSocketContext();
+  const [usersState, setUsersState] = useState(users);
 
-	const [users, setUsers] = useState(contacts);
+  const _updateUserProp = (userId, prop, value) => {
+    setUsersState((prevUsers) => {
+      const updatedUsers = [...prevUsers];
+      const userIndex = updatedUsers.findIndex((user) => user.id === userId);
 
-	const _updateUserProp = (userId, prop, value) => {
-		setUsers((users) => {
-			const usersCopy = [...users];
-			let userIndex = users.findIndex((user) => user.id === userId);
-			const userObject = usersCopy[userIndex];
-			usersCopy[userIndex] = { ...userObject, [prop]: value };
-			return usersCopy;
-		});
-	};
+      if (userIndex !== -1) {
+        const user = updatedUsers[userIndex];
+        updatedUsers[userIndex] = { ...user, [prop]: value };
+      }
 
-	const setUserAsTyping = (data) => {
-		const { userId } = data;
-		_updateUserProp(userId, "typing", true);
-	};
+      return updatedUsers;
+    });
+  };
 
-	const setUserAsNotTyping = (data) => {
-		const { userId } = data;
-		_updateUserProp(userId, "typing", false);
-	};
+  const setUserAsUnread = (userId) => {
+    _updateUserProp(userId, "unread", 0);
+  };
 
-	const fetchMessageResponse = (data) => {
-		setUsers((users) => {
-			const { userId, response } = data;
+  const addNewMessage = (userId, message) => {
+    setUsersState((prevUsers) => {
+      const updatedUsers = [...prevUsers];
+      const userIndex = updatedUsers.findIndex((user) => user.id === userId);
 
-			let userIndex = users.findIndex((user) => user.id === userId);
-			const usersCopy = JSON.parse(JSON.stringify(users));
-			const newMsgObject = {
-				content: response,
-				sender: userId,
-				time: new Date().toLocaleTimeString(),
-				status: null,
-			};
+      if (userIndex !== -1) {
+        const newMessage = {
+          content: message,
+          sender: null,
+          time: new Date().toLocaleTimeString(),
+          status: "delivered",
+        };
 
-			usersCopy[userIndex].messages.TODAY.push(newMsgObject);
+        updatedUsers[userIndex].messages.TODAY.push(newMessage);
+      }
 
-			return usersCopy;
-		});
-	};
+      return updatedUsers;
+    });
+  };
 
-	useEffect(() => {
-		socket.on("fetch_response", fetchMessageResponse);
-		socket.on("start_typing", setUserAsTyping);
-		socket.on("stop_typing", setUserAsNotTyping);
-	}, [socket]);
+  useEffect(() => {
+    const fetchUsersMessages = async () => {
+      try {
+        const response = await fetch("https://four-difficult-fuchsia.glitch.me/users-messages");
+        if (!response.ok) {
+          throw new Error(`Error fetching data: ${response.status}`);
+        }
+        const data = await response.json();
+        setUsersState((prevUsers) => {
+          // Merge with existing users if needed
+          const updatedUsers = [...prevUsers];
+          data.forEach((fetchedUser) => {
+            const existingUserIndex = updatedUsers.findIndex((user) => user.id === fetchedUser.id);
 
-	const setUserAsUnread = (userId) => {
-		_updateUserProp(userId, "unread", 0);
-	};
+            if (existingUserIndex !== -1) {
+              updatedUsers[existingUserIndex] = {
+                ...updatedUsers[existingUserIndex],
+                ...fetchedUser,
+              };
+            } else {
+              updatedUsers.push(fetchedUser);
+            }
+          });
+          return updatedUsers;
+        });
+      } catch (error) {
+        console.error("Failed to fetch user messages:", error);
+      }
+    };
 
-	const addNewMessage = (userId, message) => {
-		let userIndex = users.findIndex((user) => user.id === userId);
-		const usersCopy = [...users];
-		const newMsgObject = {
-			content: message,
-			sender: null,
-			time: new Date().toLocaleTimeString(),
-			status: "delivered",
-		};
+    fetchUsersMessages();
+  }, []);
 
-		usersCopy[userIndex].messages.TODAY.push(newMsgObject);
-		setUsers(usersCopy);
-
-		socket.emit("fetch_response", { userId });
-	};
-
-	return (
-		<UsersContext.Provider value={{ users, setUserAsUnread, addNewMessage }}>
-			{children}
-		</UsersContext.Provider>
-	);
+  return (
+    <UsersContext.Provider value={{ users: usersState, setUserAsUnread, addNewMessage }}>
+      {children}
+    </UsersContext.Provider>
+  );
 };
 
 export { useUsersContext, UsersProvider };
