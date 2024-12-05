@@ -65,8 +65,11 @@ const Chat = ({ match, history }) => {
 					openSearchSidebar={() => openSidebar(setShowSearchSidebar)}
 				/>
 				<div className="chat__content">
-					<Convo lastMsgRef={lastMsgRef} messages={user.messages} />
-				</div>
+  {user.messages && user.messages.length > 0 && (
+    <Convo lastMsgRef={lastMsgRef} messages={user.messages} />
+  )}
+</div>
+
 				<footer className="chat__footer">
 					<button
 						className="chat__scroll-btn"
