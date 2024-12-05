@@ -1,5 +1,4 @@
-// services/userService.js
-
+// Import profile pictures
 import ppGirl1 from "assets/images/profile-picture-girl-1.jpeg";
 import ppGirl2 from "assets/images/profile-picture-girl-2.jpeg";
 import ppGirl3 from "assets/images/profile-picture-girl-3.jpeg";
@@ -7,127 +6,116 @@ import ppGirl4 from "assets/images/profile-picture-girl-4.jpeg";
 import ppBoy1 from "assets/images/profile-picture-boy-1.jpeg";
 import ppBoy2 from "assets/images/profile-picture-boy-2.jpeg";
 import ppBoy3 from "assets/images/profile-picture-boy-3.jpeg";
+
+// Import utility function
 import getRandomSentence from "utils/getRandomSentence";
 
-// Initial Dummy Data
-let users = [
-    {
-        id: 1,
-        profile_picture: ppGirl3,
-        name: "Love of my life ❤️💜",
-        phone_number: "+2348123456789",
-        whatsapp_name: "Beyonce",
-        unread: 3,
-        messages: {
-            "04/06/2021": [
-                {
-                    content: getRandomSentence(),
-                    sender: 1,
-                    time: "08:11:26",
-                    status: null,
-                },
-                // ... other messages
-            ],
-            YESTERDAY: [
-                // ... messages
-            ],
-            TODAY: [
-                // ... messages
-            ],
+// Define dummy users
+const dummyUsers = [
+  {
+    id: 1,
+    profile_picture: ppGirl3,
+    name: "Love of my life ❤️💜",
+    phone_number: "+2348123456789",
+    whatsapp_name: "Beyonce",
+    unread: 3,
+    messages: {
+      "04/06/2021": [
+        {
+          content: getRandomSentence(),
+          sender: 1,
+          time: "08:11:26",
+          status: null,
         },
-        group: false,
-        pinned: true,
-        typing: false,
+        // ... other messages
+      ],
+      YESTERDAY: [
+        // ... messages
+      ],
+      TODAY: [
+        // ... messages
+      ],
     },
-    // ... other dummy users
+    group: false,
+    pinned: true,
+    typing: false,
+  },
+  // ... other dummy users
+  // Ensure all dummy users are defined similarly
 ];
 
-// Function to fetch data from the API and merge with dummy data
-export async function fetchAndMergeUsers() {
-    const apiUrl = 'https://four-difficult-fuchsia.glitch.me/users-messages';
-  
-    try {
-        const response = await fetch(apiUrl);
-      
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-      
-        const fetchedData = await response.json();
-      
-        if (fetchedData && fetchedData.data) {
-            // Merge fetched data with dummy data
-            fetchedData.data.forEach(fetchedUser => {
-                const existingUserIndex = users.findIndex(user => user.id === fetchedUser.id);
-                
-                if (existingUserIndex !== -1) {
-                    // Merge messages, handling nulls
-                    users[existingUserIndex] = {
-                        ...users[existingUserIndex],
-                        ...fetchedUser,
-                        messages: mergeMessages(users[existingUserIndex].messages, fetchedUser.messages),
-                    };
-                } else {
-                    // Add new user from fetched data
-                    users.push({
-                        ...fetchedUser,
-                        profile_picture: handleProfilePicture(fetchedUser.profile_picture),
-                        messages: fetchedUser.messages || {},
-                        unread: fetchedUser.unread || 0,
-                        group: fetchedUser.group || false,
-                        pinned: fetchedUser.pinned || false,
-                        typing: fetchedUser.typing || false,
-                    });
-                }
-            });
-        }
+// Initialize users with dummy data
+const users = [...dummyUsers];
 
-        return users;
-    } catch (error) {
-        console.error('Error fetching data:', error);
-        return users; // Return existing users even if fetch fails
+// Function to fetch data from the API
+async function fetchUsersMessages() {
+  const apiUrl = "https://four-difficult-fuchsia.glitch.me/users-messages";
+
+  try {
+    const response = await fetch(apiUrl);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
     }
+
+    const data = await response.json();
+
+    // Assuming the API returns data in the same structure as dummyUsers
+    return data.data; // Adjust this based on your actual API response structure
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    return []; // Return an empty array or handle as needed
+  }
 }
 
-// Helper function to merge messages
-function mergeMessages(dummyMessages, fetchedMessages) {
-    const mergedMessages = { ...dummyMessages };
-
-    Object.keys(fetchedMessages).forEach(dateKey => {
-        if (mergedMessages[dateKey]) {
-            mergedMessages[dateKey] = [
-                ...mergedMessages[dateKey],
-                ...fetchedMessages[dateKey].map(msg => ({
-                    ...msg,
-                    content: msg.content || "", // Handle null content
-                    sender: msg.sender || null,
-                    time: msg.time || "00:00:00",
-                    status: msg.status || "sent",
-                    image: msg.image || false,
-                })),
-            ];
-        } else {
-            mergedMessages[dateKey] = fetchedMessages[dateKey].map(msg => ({
-                ...msg,
-                content: msg.content || "",
-                sender: msg.sender || null,
-                time: msg.time || "00:00:00",
-                status: msg.status || "sent",
-                image: msg.image || false,
-            }));
-        }
-    });
-
-    return mergedMessages;
+// Helper function to deeply merge two objects with null handling
+function deepMergeWithNullHandling(target, source) {
+  for (const key in source) {
+    if (
+      source[key] &&
+      typeof source[key] === "object" &&
+      !Array.isArray(source[key])
+    ) {
+      if (!target[key]) {
+        target[key] = {};
+      }
+      deepMergeWithNullHandling(target[key], source[key]);
+    } else {
+      // Only overwrite if source value is not null
+      if (source[key] !== null) {
+        target[key] = source[key];
+      }
+    }
+  }
+  return target;
 }
 
-// Helper function to handle profile pictures (if URLs or different logic is needed)
-function handleProfilePicture(picture) {
-    // Implement logic if fetched data provides URLs or different identifiers
-    return picture;
+// Function to merge fetched users with existing users
+async function mergeFetchedUsers() {
+  const fetchedUsers = await fetchUsersMessages();
+
+  // Create a map for quick lookup of fetched users by ID
+  const fetchedUsersMap = new Map();
+  fetchedUsers.forEach((user) => {
+    fetchedUsersMap.set(user.id, user);
+  });
+
+  // Merge fetched users into the existing users array
+  fetchedUsers.forEach((fetchedUser) => {
+    const existingUserIndex = users.findIndex((user) => user.id === fetchedUser.id);
+
+    if (existingUserIndex !== -1) {
+      // Perform deep merge with null handling
+      deepMergeWithNullHandling(users[existingUserIndex], fetchedUser);
+    } else {
+      // If the user doesn't exist in dummy data, add them
+      users.push(fetchedUser);
+    }
+  });
 }
 
-// Function to get current users (could be enhanced with state management)
-export function getUsers() {
-    return users;
-}
+// Immediately invoke the merge operation
+mergeFetchedUsers();
+
+// Export users as the default export
+export default users;
