@@ -22,22 +22,22 @@ const Chat = ({ match, history }) => {
 	const [showProfileSidebar, setShowProfileSidebar] = useState(false);
 	const [showSearchSidebar, setShowSearchSidebar] = useState(false);
 	const [newMessage, setNewMessage] = useState("");
+	const [initialScrollDone, setInitialScrollDone] = useState(false); // Track if initial scroll is done
 
 	useEffect(() => {
 		// Redirect if user not found
 		if (!user) {
 			history.push("/");
-		} else {
+		} else if (!initialScrollDone) {
 			scrollToLastMsg();
 			setUserAsUnread(user.id); // Mark the user as unread
+			setInitialScrollDone(true); // Mark initial scroll as done
 		}
-	}, [user, history, setUserAsUnread]);
+	}, [user, history, setUserAsUnread, initialScrollDone]);
 
+	// Manual scrolling is not affected by re-renders
 	useEffect(() => {
-		// Scroll to the last message whenever users change
-		if (user) {
-			scrollToLastMsg();
-		}
+		// Perform any operations when `users` changes
 	}, [users]);
 
 	const openSidebar = (cb) => {
@@ -52,7 +52,7 @@ const Chat = ({ match, history }) => {
 	const scrollToLastMsg = () => {
 		// Ensure `lastMsgRef` exists before scrolling
 		if (lastMsgRef.current) {
-			lastMsgRef.current.scrollIntoView();
+			lastMsgRef.current.scrollIntoView({ behavior: "smooth" });
 		}
 	};
 
@@ -60,7 +60,7 @@ const Chat = ({ match, history }) => {
 		// Add a new message for the user and reset the input
 		addNewMessage(user.id, newMessage);
 		setNewMessage("");
-		scrollToLastMsg();
+		setTimeout(scrollToLastMsg, 100); // Scroll after DOM update
 	};
 
 	return (
@@ -74,7 +74,8 @@ const Chat = ({ match, history }) => {
 					openSearchSidebar={() => openSidebar(setShowSearchSidebar)}
 				/>
 				<div className="chat__content">
-					<Convo lastMsgRef={lastMsgRef} messages={user?.messages || {}} />
+					{/* Pass reversed messages to Convo */}
+					<Convo lastMsgRef={lastMsgRef} messages={Object.values(user?.messages || {}).flat().reverse()} />
 				</div>
 				<footer className="chat__footer">
 					<button
