@@ -22,17 +22,17 @@ const dummyUsers = [
     messages: {
       "04/06/2021": [
         {
-			content: getRandomSentence(),
-			sender: 8,
-			time: "08:11:26",
-			status: null,
-		},
-		{
-			content: getRandomSentence(),
-			sender: null,
-			time: "08:15:45",
-			status: "read",
-		},
+          content: getRandomSentence(),
+          sender: 8,
+          time: "08:11:26",
+          status: null,
+        },
+        {
+          content: getRandomSentence(),
+          sender: null,
+          time: "08:15:45",
+          status: "read",
+        },
       ],
     },
     group: false,
@@ -41,6 +41,7 @@ const dummyUsers = [
   },
 ];
 
+// Initialize users with dummy data
 const users = [...dummyUsers];
 
 // Function to fetch data from the API
@@ -88,30 +89,46 @@ function deepMergeWithNullHandling(target, source) {
 
 // Function to merge fetched users with existing users
 async function mergeFetchedUsers() {
-  const fetchedUsers = await fetchUsersMessages();
+  try {
+    const fetchedUsers = await fetchUsersMessages();
 
-  // Create a map for quick lookup of fetched users by ID
-  const fetchedUsersMap = new Map();
-  fetchedUsers.forEach((user) => {
-    fetchedUsersMap.set(user.id, user);
-  });
+    // Create a map for quick lookup of fetched users by ID
+    const fetchedUsersMap = new Map();
+    fetchedUsers.forEach((user) => {
+      fetchedUsersMap.set(user.id, user);
+    });
 
-  // Merge fetched users into the existing users array
-  fetchedUsers.forEach((fetchedUser) => {
-    const existingUserIndex = users.findIndex((user) => user.id === fetchedUser.id);
+    // Merge fetched users into the existing users array
+    fetchedUsers.forEach((fetchedUser) => {
+      const existingUserIndex = users.findIndex((user) => user.id === fetchedUser.id);
 
-    if (existingUserIndex !== -1) {
-      // Perform deep merge with null handling
-      deepMergeWithNullHandling(users[existingUserIndex], fetchedUser);
-    } else {
-      // If the user doesn't exist in dummy data, add them
-      users.push(fetchedUser);
-    }
-  });
+      if (existingUserIndex !== -1) {
+        // Perform deep merge with null handling
+        deepMergeWithNullHandling(users[existingUserIndex], fetchedUser);
+      } else {
+        // If the user doesn't exist in dummy data, add them
+        users.push(fetchedUser);
+      }
+    });
+
+    console.log("Users updated:", users);
+  } catch (error) {
+    console.error("Error merging fetched users:", error);
+  }
 }
 
-// Immediately invoke the merge operation
-mergeFetchedUsers();
+// Function to periodically fetch and update users
+function startPollingForUpdates() {
+  const pollingInterval = 3000; // 3 seconds
+
+  setInterval(async () => {
+    console.log("Checking for updates...");
+    await mergeFetchedUsers();
+  }, pollingInterval);
+}
+
+// Start the polling mechanism
+startPollingForUpdates();
 
 // Export users as the default export
 export default users;
