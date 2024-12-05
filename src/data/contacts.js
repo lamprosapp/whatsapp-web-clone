@@ -29,12 +29,6 @@ const dummyUsers = [
         },
         // ... other messages
       ],
-      YESTERDAY: [
-        // ... messages
-      ],
-      TODAY: [
-        // ... messages
-      ],
     },
     group: false,
     pinned: true,
