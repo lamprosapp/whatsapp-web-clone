@@ -13,8 +13,8 @@ import { useUsersContext } from "context/usersContext";
 const Chat = ({ match, history }) => {
 	const { users, setUserAsUnread, addNewMessage } = useUsersContext();
 
-	const userId = match.params.id;
-	let user = users.filter((user) => user.id === Number(userId))[0];
+	const userId = match.params.id; // `id` from the URL (string)
+	let user = users.find((user) => user.id === userId); // Compare as strings
 
 	const lastMsgRef = useRef(null);
 	const [showAttach, setShowAttach] = useState(false);
@@ -24,31 +24,40 @@ const Chat = ({ match, history }) => {
 	const [newMessage, setNewMessage] = useState("");
 
 	useEffect(() => {
-		if (!user) history.push("/");
-		else {
+		// Redirect if user not found
+		if (!user) {
+			history.push("/");
+		} else {
 			scrollToLastMsg();
-			setUserAsUnread(user.id);
+			setUserAsUnread(user.id); // Mark the user as unread
 		}
-	}, []);
+	}, [user, history, setUserAsUnread]);
 
 	useEffect(() => {
-		user && scrollToLastMsg();
+		// Scroll to the last message whenever users change
+		if (user) {
+			scrollToLastMsg();
+		}
 	}, [users]);
 
 	const openSidebar = (cb) => {
-		// close any open sidebar first
+		// Close any open sidebar first
 		setShowProfileSidebar(false);
 		setShowSearchSidebar(false);
 
-		// call callback fn
+		// Call the callback function to open the new sidebar
 		cb(true);
 	};
 
 	const scrollToLastMsg = () => {
-		lastMsgRef.current.scrollIntoView();
+		// Ensure `lastMsgRef` exists before scrolling
+		if (lastMsgRef.current) {
+			lastMsgRef.current.scrollIntoView();
+		}
 	};
 
 	const submitNewMessage = () => {
+		// Add a new message for the user and reset the input
 		addNewMessage(user.id, newMessage);
 		setNewMessage("");
 		scrollToLastMsg();
@@ -65,7 +74,7 @@ const Chat = ({ match, history }) => {
 					openSearchSidebar={() => openSidebar(setShowSearchSidebar)}
 				/>
 				<div className="chat__content">
-					<Convo lastMsgRef={lastMsgRef} messages={user.messages} />
+					<Convo lastMsgRef={lastMsgRef} messages={user?.messages || {}} />
 				</div>
 				<footer className="chat__footer">
 					<button
