@@ -58,7 +58,7 @@ const UsersProvider = ({ children }) => {
         setUsersState((prevUsers) => {
           // Merge with existing users if needed
           const updatedUsers = [...prevUsers];
-          data.forEach((fetchedUser) => {
+          data.data.forEach((fetchedUser) => {
             const existingUserIndex = updatedUsers.findIndex((user) => user.id === fetchedUser.id);
 
             if (existingUserIndex !== -1) {
