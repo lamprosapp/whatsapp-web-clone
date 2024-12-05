@@ -18,11 +18,20 @@ const ChatInput = ({
 	setNewMessage,
 	submitNewMessage,
 }) => {
-	const detectEnterPress = (e) => {
-		if (e.key === "Enter" || e.keyCode === 13) {
+	// Wrap the original submitNewMessage to include alert
+	const handleSendMessage = () => {
+		if (newMessage.trim()) {
+			alert(`Message sent: ${newMessage}`);
 			submitNewMessage();
 		}
 	};
+
+	const detectEnterPress = (e) => {
+		if (e.key === "Enter" || e.keyCode === 13) {
+			handleSendMessage();
+		}
+	};
+
 	return (
 		<div className="chat__input-wrapper">
 			{showEmojis && (
@@ -80,7 +89,7 @@ const ChatInput = ({
 				onKeyDown={detectEnterPress}
 			/>
 			{newMessage ? (
-				<button aria-label="Send message" onClick={submitNewMessage}>
+				<button aria-label="Send message" onClick={handleSendMessage}>
 					<Icon id="send" className="chat__input-icon" />
 				</button>
 			) : (
