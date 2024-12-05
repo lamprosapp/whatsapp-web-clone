@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import users from "./data/contacts";
+import users from "../data/contacts";
 
 // Create Users Context
 const UsersContext = createContext();
