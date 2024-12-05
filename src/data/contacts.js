@@ -22,23 +22,25 @@ const dummyUsers = [
     messages: {
       "04/06/2021": [
         {
-          content: getRandomSentence(),
-          sender: 1,
-          time: "08:11:26",
-          status: null,
-        },
-        // ... other messages
+			content: getRandomSentence(),
+			sender: 8,
+			time: "08:11:26",
+			status: null,
+		},
+		{
+			content: getRandomSentence(),
+			sender: null,
+			time: "08:15:45",
+			status: "read",
+		},
       ],
     },
     group: false,
     pinned: true,
     typing: false,
   },
-  // ... other dummy users
-  // Ensure all dummy users are defined similarly
 ];
 
-// Initialize users with dummy data
 const users = [...dummyUsers];
 
 // Function to fetch data from the API
