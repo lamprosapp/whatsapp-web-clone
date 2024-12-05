@@ -5,15 +5,15 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 
 import "./assets/css/index.css";
-import { UsersProvider } from "context/usersContext";
+// import { UsersProvider } from "context/usersContext";
 // import { SocketProvider } from "context/socketContext";
 
 ReactDOM.render(
 	<React.StrictMode>
 		{/* <SocketProvider> */}
-			<UsersProvider>
+			{/* <UsersProvider> */}
 				<App />
-			</UsersProvider>
+			{/* </UsersProvider> */}
 		{/* </SocketProvider> */}
 	</React.StrictMode>,
 	document.getElementById("root")
