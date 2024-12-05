@@ -14,7 +14,7 @@ const Chat = ({ match, history }) => {
 	const { users, setUserAsUnread, addNewMessage } = useUsersContext();
 
 	const userId = match.params.id;
-	let user = users.filter((user) => user.id === userId);
+	let user = users.find((user) => user.id === userId);
 
 	const lastMsgRef = useRef(null);
 	const [showAttach, setShowAttach] = useState(false);
@@ -24,34 +24,41 @@ const Chat = ({ match, history }) => {
 	const [newMessage, setNewMessage] = useState("");
 
 	useEffect(() => {
-		if (!user) history.push("/");
-		else {
+		if (!user) {
+			history.push("/");
+		} else {
 			scrollToLastMsg();
 			setUserAsUnread(user.id);
 		}
-	}, []);
+	}, [user]);
 
 	useEffect(() => {
-		user && scrollToLastMsg();
+		if (user && user.messages) {
+			scrollToLastMsg();
+		}
 	}, [users]);
 
 	const openSidebar = (cb) => {
-		// close any open sidebar first
+		// Close any open sidebar first
 		setShowProfileSidebar(false);
 		setShowSearchSidebar(false);
 
-		// call callback fn
+		// Call callback fn
 		cb(true);
 	};
 
 	const scrollToLastMsg = () => {
-		lastMsgRef.current.scrollIntoView();
+		if (lastMsgRef.current) {
+			lastMsgRef.current.scrollIntoView();
+		}
 	};
 
 	const submitNewMessage = () => {
-		addNewMessage(user.id, newMessage);
-		setNewMessage("");
-		scrollToLastMsg();
+		if (user && newMessage.trim()) {
+			addNewMessage(user.id, newMessage);
+			setNewMessage("");
+			scrollToLastMsg();
+		}
 	};
 
 	return (
@@ -59,16 +66,19 @@ const Chat = ({ match, history }) => {
 			<div className="chat__body">
 				<div className="chat__bg"></div>
 
-				<Header
-					user={user}
-					openProfileSidebar={() => openSidebar(setShowProfileSidebar)}
-					openSearchSidebar={() => openSidebar(setShowSearchSidebar)}
-				/>
+				{user && (
+					<Header
+						user={user}
+						openProfileSidebar={() => openSidebar(setShowProfileSidebar)}
+						openSearchSidebar={() => openSidebar(setShowSearchSidebar)}
+					/>
+				)}
+
 				<div className="chat__content">
-  {user.messages && user.messages.length > 0 && (
-    <Convo lastMsgRef={lastMsgRef} messages={user.messages} />
-  )}
-</div>
+					{user && user.messages && user.messages.length > 0 && (
+						<Convo lastMsgRef={lastMsgRef} messages={user.messages} />
+					)}
+				</div>
 
 				<footer className="chat__footer">
 					<button
@@ -107,7 +117,7 @@ const Chat = ({ match, history }) => {
 				active={showProfileSidebar}
 				closeSidebar={() => setShowProfileSidebar(false)}
 			>
-				<Profile user={user} />
+				{user && <Profile user={user} />}
 			</ChatSidebar>
 		</div>
 	);
