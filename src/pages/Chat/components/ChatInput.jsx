@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React from "react";
 import Icon from "components/Icon";
 
 const attachButtons = [
@@ -18,33 +18,38 @@ const ChatInput = ({
   setNewMessage,
   submitNewMessage,
 }) => {
-  const inputRef = useRef(null);
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setNewMessage(value);
+  };
 
-  const detectEnterPress = (e) => {
+  const handleKeyPress = (e) => {
     if (e.key === "Enter") {
       submitNewMessage();
     }
   };
 
-  const handleInputChange = (e) => {
-    setNewMessage(e.target.value);
+  const handleToggleAttach = () => {
+    setShowAttach(!showAttach);
+    setShowEmojis(false); // Close emojis when attach is toggled
   };
 
-  const toggleAttach = () => {
-    setShowAttach((prev) => !prev);
-    if (inputRef.current) {
-      inputRef.current.focus(); // Ensure the input stays focused
-    }
+  const handleToggleEmojis = () => {
+    setShowEmojis(!showEmojis);
+    setShowAttach(false); // Close attach when emojis are toggled
   };
 
   return (
     <div className="chat__input-wrapper">
       {showEmojis && (
-        <button aria-label="Close emojis" onClick={() => setShowEmojis(false)}>
+        <button
+          aria-label="Close emojis"
+          onClick={() => setShowEmojis(false)}
+        >
           <Icon id="cancel" className="chat__input-icon" />
         </button>
       )}
-      <button aria-label="Emojis" onClick={() => setShowEmojis(true)}>
+      <button aria-label="Emojis" onClick={handleToggleEmojis}>
         <Icon
           id="smiley"
           className={`chat__input-icon ${
@@ -63,7 +68,7 @@ const ChatInput = ({
         </>
       )}
       <div className="pos-rel">
-        <button aria-label="Attach" onClick={toggleAttach}>
+        <button aria-label="Attach" onClick={handleToggleAttach}>
           <Icon
             id="attach"
             className={`chat__input-icon ${
@@ -87,12 +92,11 @@ const ChatInput = ({
         </div>
       </div>
       <input
-        ref={inputRef}
         className="chat__input"
         placeholder="Type a message"
         value={newMessage}
         onChange={handleInputChange}
-        onKeyDown={detectEnterPress}
+        onKeyDown={handleKeyPress}
       />
       {newMessage ? (
         <button aria-label="Send message" onClick={submitNewMessage}>
