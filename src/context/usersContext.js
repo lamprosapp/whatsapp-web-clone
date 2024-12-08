@@ -1,5 +1,6 @@
 import { createContext, useContext, useState } from "react";
 import users from "../data/contacts";
+import axios from "axios";
 
 // Create Users Context
 const UsersContext = createContext();
@@ -27,7 +28,7 @@ const UsersProvider = ({ children }) => {
     _updateUserProp(userId, "unread", 0);
   };
 
-  const addNewMessage = (userId, message) => {
+  const addNewMessage = async (userId, message, media = null) => {
     setUsersState((prevUsers) => {
       const updatedUsers = [...prevUsers];
       const userIndex = updatedUsers.findIndex((user) => user.id === userId);
@@ -37,7 +38,8 @@ const UsersProvider = ({ children }) => {
           content: message,
           sender: null,
           time: new Date().toLocaleTimeString(),
-          status: "delivered",
+          status: "pending",
+          media: media ? true : false,
         };
 
         updatedUsers[userIndex].messages.TODAY.push(newMessage);
@@ -45,6 +47,47 @@ const UsersProvider = ({ children }) => {
 
       return updatedUsers;
     });
+
+    try {
+      const payload = {
+        to: userId,
+        message,
+        media,
+      };
+
+      const response = await axios.post("https://four-difficult-fuchsia.glitch.me/send", payload);
+
+      setUsersState((prevUsers) => {
+        const updatedUsers = [...prevUsers];
+        const userIndex = updatedUsers.findIndex((user) => user.id === userId);
+
+        if (userIndex !== -1) {
+          const userMessages = updatedUsers[userIndex].messages.TODAY;
+          const lastMessage = userMessages[userMessages.length - 1];
+          if (lastMessage && lastMessage.content === message) {
+            lastMessage.status = "delivered";
+          }
+        }
+
+        return updatedUsers;
+      });
+    } catch (error) {
+      console.error("Error sending message:", error.response?.data || error.message);
+      setUsersState((prevUsers) => {
+        const updatedUsers = [...prevUsers];
+        const userIndex = updatedUsers.findIndex((user) => user.id === userId);
+
+        if (userIndex !== -1) {
+          const userMessages = updatedUsers[userIndex].messages.TODAY;
+          const lastMessage = userMessages[userMessages.length - 1];
+          if (lastMessage && lastMessage.content === message) {
+            lastMessage.status = "failed";
+          }
+        }
+
+        return updatedUsers;
+      });
+    }
   };
 
   return (
