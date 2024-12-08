@@ -16,35 +16,19 @@ const Chat = ({ match, history }) => {
   const user = users.find((user) => user.id === userId);
 
   const lastMsgRef = useRef(null);
+  const hasMarkedAsUnread = useRef(false);
   const [showAttach, setShowAttach] = useState(false);
   const [showEmojis, setShowEmojis] = useState(false);
   const [showProfileSidebar, setShowProfileSidebar] = useState(false);
   const [showSearchSidebar, setShowSearchSidebar] = useState(false);
   const [newMessage, setNewMessage] = useState("");
 
-  useEffect(() => {
-    if (!user) {
-      console.log("User not found. Redirecting to home.");
-      history.push("/");
-      return;
-    }
-    console.log("User found. Marking as unread:", user.id);
-    scrollToLastMsg();
-    setUserAsUnread(user.id);
-  }, [user, history, setUserAsUnread]);
-
-  useEffect(() => {
-    if (user) {
-      console.log("Users updated. Scrolling to the last message.");
-      scrollToLastMsg();
-    }
-  }, [users]);
-
-  const openSidebar = (cb, currentState) => {
-    console.log("Opening sidebar. Current state:", currentState);
-    setShowProfileSidebar(false);
-    setShowSearchSidebar(false);
-    cb(!currentState);
+  const debounce = (func, delay) => {
+    let timeout;
+    return (...args) => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func(...args), delay);
+    };
   };
 
   const scrollToLastMsg = () => {
@@ -52,6 +36,36 @@ const Chat = ({ match, history }) => {
       console.log("Scrolling to last message.");
       lastMsgRef.current.scrollIntoView({ behavior: "smooth" });
     }
+  };
+
+  const debouncedScrollToLastMsg = debounce(scrollToLastMsg, 100);
+
+  useEffect(() => {
+    if (!user) {
+      console.log("User not found. Redirecting to home.");
+      history.push("/");
+      return;
+    }
+    if (!hasMarkedAsUnread.current) {
+      console.log("User found. Marking as unread:", user.id);
+      setUserAsUnread(user.id);
+      hasMarkedAsUnread.current = true;
+    }
+    scrollToLastMsg();
+  }, [user, history, setUserAsUnread]);
+
+  useEffect(() => {
+    if (user) {
+      console.log("Users updated. Checking if scroll is necessary.");
+      debouncedScrollToLastMsg();
+    }
+  }, [user?.messages]);
+
+  const openSidebar = (cb, currentState) => {
+    console.log("Opening sidebar. Current state:", currentState);
+    setShowProfileSidebar(false);
+    setShowSearchSidebar(false);
+    cb(!currentState);
   };
 
   const submitNewMessage = () => {
