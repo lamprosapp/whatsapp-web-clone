@@ -28,7 +28,7 @@ const UsersProvider = ({ children }) => {
     _updateUserProp(userId, "unread", 0);
   };
 
-  const addNewMessage = async (userId,phone_number, message, media = null) => {
+  const addNewMessage = async (userId, phone_number, message, media = null) => {
     setUsersState((prevUsers) => {
       const updatedUsers = [...prevUsers];
       const userIndex = updatedUsers.findIndex((user) => user.id === userId);
@@ -90,8 +90,29 @@ const UsersProvider = ({ children }) => {
     }
   };
 
+  const updateUsers = (fetchedUsers) => {
+    setUsersState((prevUsers) => {
+      const updatedUsers = [...prevUsers];
+
+      fetchedUsers.forEach((fetchedUser) => {
+        const existingUserIndex = updatedUsers.findIndex((user) => user.id === fetchedUser.id);
+
+        if (existingUserIndex !== -1) {
+          updatedUsers[existingUserIndex] = {
+            ...updatedUsers[existingUserIndex],
+            ...fetchedUser,
+          };
+        } else {
+          updatedUsers.push(fetchedUser);
+        }
+      });
+
+      return updatedUsers;
+    });
+  };
+
   return (
-    <UsersContext.Provider value={{ users: usersState, setUserAsUnread, addNewMessage }}>
+    <UsersContext.Provider value={{ users: usersState, setUserAsUnread, addNewMessage, updateUsers }}>
       {children}
     </UsersContext.Provider>
   );
