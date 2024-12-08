@@ -12,7 +12,7 @@ const Header = ({ user, openProfileSidebar, openSearchSidebar }) => {
 			<div className="chat__contact-wrapper" onClick={openProfileSidebar}>
 				<h2 className="chat__contact-name"> {user?.name}</h2>
 				<p className="chat__contact-desc">
-					{user.typing ? "typing..." : "online"}
+					{user.typing ? "typing..." : user?.phone_number}
 				</p>
 			</div>
 			<div className="chat__actions">
