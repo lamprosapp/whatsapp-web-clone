@@ -43,75 +43,75 @@ const dummyUsers = [
 
 const users = [...dummyUsers];
 
-// Function to fetch data from the API
-async function fetchUsersMessages() {
-  const apiUrl = "https://four-difficult-fuchsia.glitch.me/users-messages";
+// // Function to fetch data from the API
+// async function fetchUsersMessages() {
+//   const apiUrl = "https://four-difficult-fuchsia.glitch.me/users-messages";
 
-  try {
-    const response = await fetch(apiUrl);
+//   try {
+//     const response = await fetch(apiUrl);
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
+//     if (!response.ok) {
+//       throw new Error(`HTTP error! Status: ${response.status}`);
+//     }
 
-    const data = await response.json();
+//     const data = await response.json();
 
-    // Assuming the API returns data in the same structure as dummyUsers
-    return data.data; // Adjust this based on your actual API response structure
-  } catch (error) {
-    console.error("Error fetching data:", error);
-    return []; // Return an empty array or handle as needed
-  }
-}
+//     // Assuming the API returns data in the same structure as dummyUsers
+//     return data.data; // Adjust this based on your actual API response structure
+//   } catch (error) {
+//     console.error("Error fetching data:", error);
+//     return []; // Return an empty array or handle as needed
+//   }
+// }
 
-// Helper function to deeply merge two objects with null handling
-function deepMergeWithNullHandling(target, source) {
-  for (const key in source) {
-    if (
-      source[key] &&
-      typeof source[key] === "object" &&
-      !Array.isArray(source[key])
-    ) {
-      if (!target[key]) {
-        target[key] = {};
-      }
-      deepMergeWithNullHandling(target[key], source[key]);
-    } else {
-      // Only overwrite if source value is not null
-      if (source[key] !== null) {
-        target[key] = source[key];
-      }
-    }
-  }
-  return target;
-}
+// // Helper function to deeply merge two objects with null handling
+// function deepMergeWithNullHandling(target, source) {
+//   for (const key in source) {
+//     if (
+//       source[key] &&
+//       typeof source[key] === "object" &&
+//       !Array.isArray(source[key])
+//     ) {
+//       if (!target[key]) {
+//         target[key] = {};
+//       }
+//       deepMergeWithNullHandling(target[key], source[key]);
+//     } else {
+//       // Only overwrite if source value is not null
+//       if (source[key] !== null) {
+//         target[key] = source[key];
+//       }
+//     }
+//   }
+//   return target;
+// }
 
-// Function to merge fetched users with existing users
-async function mergeFetchedUsers() {
-  const fetchedUsers = await fetchUsersMessages();
+// // Function to merge fetched users with existing users
+// async function mergeFetchedUsers() {
+//   const fetchedUsers = await fetchUsersMessages();
 
-  // Create a map for quick lookup of fetched users by ID
-  const fetchedUsersMap = new Map();
-  fetchedUsers.forEach((user) => {
-    fetchedUsersMap.set(user.id, user);
-  });
+//   // Create a map for quick lookup of fetched users by ID
+//   const fetchedUsersMap = new Map();
+//   fetchedUsers.forEach((user) => {
+//     fetchedUsersMap.set(user.id, user);
+//   });
 
-  // Merge fetched users into the existing users array
-  fetchedUsers.forEach((fetchedUser) => {
-    const existingUserIndex = users.findIndex((user) => user.id === fetchedUser.id);
+//   // Merge fetched users into the existing users array
+//   fetchedUsers.forEach((fetchedUser) => {
+//     const existingUserIndex = users.findIndex((user) => user.id === fetchedUser.id);
 
-    if (existingUserIndex !== -1) {
-      // Perform deep merge with null handling
-      deepMergeWithNullHandling(users[existingUserIndex], fetchedUser);
-    } else {
-      // If the user doesn't exist in dummy data, add them
-      users.push(fetchedUser);
-    }
-  });
-}
+//     if (existingUserIndex !== -1) {
+//       // Perform deep merge with null handling
+//       deepMergeWithNullHandling(users[existingUserIndex], fetchedUser);
+//     } else {
+//       // If the user doesn't exist in dummy data, add them
+//       users.push(fetchedUser);
+//     }
+//   });
+// }
 
-// Immediately invoke the merge operation
-mergeFetchedUsers();
+// // Immediately invoke the merge operation
+// mergeFetchedUsers();
 
 
 // // Function to periodically fetch and update users
