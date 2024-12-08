@@ -1,3 +1,15 @@
+import React, { useEffect, useRef, useState } from "react";
+import "./styles/main.css";
+import EmojiTray from "./components/EmojiTray";
+import ChatInput from "./components/ChatInput";
+import Header from "./components/Header";
+import ChatSidebar from "./components/ChatSidebar";
+import Icon from "components/Icon";
+import Search from "./components/Search";
+import Profile from "./components/Profile";
+import Convo from "./components/Convo";
+import { useUsersContext } from "context/usersContext";
+
 const Chat = ({ match, history }) => {
 	const { users, setUserAsUnread, addNewMessage } = useUsersContext();
   
