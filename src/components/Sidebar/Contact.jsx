@@ -59,7 +59,7 @@ const Contact = ({ contact }) => {
       </div>
       <div className="sidebar-contact__content">
         <div className="sidebar-contact__top-content">
-          <h2 className="sidebar-contact__name">{contact.name}</h2>
+          <h2 className="sidebar-contact__name">{contact.name == 'Unknown User' ? contact.phone_number : contact.name}</h2>
           <span className="sidebar-contact__time">
             {lastMessage ? formatTime(lastMessage.time) : ""}
           </span>
