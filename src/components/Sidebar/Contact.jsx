@@ -11,14 +11,12 @@ const Contact = ({ contact }) => {
   const getLastMessage = () => {
     // Ensure contact.messages is defined and is an object
     if (!contact.messages || typeof contact.messages !== "object") {
-      console.warn(`Invalid messages structure for contact ID: ${contact.id}`);
       return null;
     }
 
     const messageDates = Object.keys(contact.messages);
 
     if (messageDates.length === 0) {
-      console.warn(`No messages found for contact ID: ${contact.id}`);
       return null;
     }
 
@@ -29,10 +27,6 @@ const Contact = ({ contact }) => {
 
     // Check if messagesArray is an array
     if (!Array.isArray(messagesArray)) {
-      console.warn(
-        `Expected messagesArray to be an array for contact ID: ${contact.id}, date: ${recentMessageDate}, but got:`,
-        messagesArray
-      );
       return null;
     }
 

@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useState } from "react";
 import users from "../data/contacts";
 
 // Create Users Context
@@ -46,39 +46,6 @@ const UsersProvider = ({ children }) => {
       return updatedUsers;
     });
   };
-
-  useEffect(() => {
-    const fetchUsersMessages = async () => {
-      try {
-        const response = await fetch("https://four-difficult-fuchsia.glitch.me/users-messages");
-        if (!response.ok) {
-          throw new Error(`Error fetching data: ${response.status}`);
-        }
-        const data = await response.json();
-        setUsersState((prevUsers) => {
-          // Merge with existing users if needed
-          const updatedUsers = [...prevUsers];
-          data.data.forEach((fetchedUser) => {
-            const existingUserIndex = updatedUsers.findIndex((user) => user.id === fetchedUser.id);
-
-            if (existingUserIndex !== -1) {
-              updatedUsers[existingUserIndex] = {
-                ...updatedUsers[existingUserIndex],
-                ...fetchedUser,
-              };
-            } else {
-              updatedUsers.push(fetchedUser);
-            }
-          });
-          return updatedUsers;
-        });
-      } catch (error) {
-        console.error("Failed to fetch user messages:", error);
-      }
-    };
-
-    fetchUsersMessages();
-  }, []);
 
   return (
     <UsersContext.Provider value={{ users: usersState, setUserAsUnread, addNewMessage }}>
