@@ -11,37 +11,37 @@ import ppBoy3 from "assets/images/profile-picture-boy-3.jpeg";
 import getRandomSentence from "utils/getRandomSentence";
 
 // Define dummy users
-const dummyUsers = [
-  {
-    id: 1,
-    profile_picture: ppGirl3,
-    name: "Love of my life ❤️💜",
-    phone_number: "+2348123456789",
-    whatsapp_name: "Beyonce",
-    unread: 3,
-    messages: {
-      "04/06/2021": [
-        {
-			content: getRandomSentence(),
-			sender: 8,
-			time: "08:11:26",
-			status: null,
-		},
-		{
-			content: getRandomSentence(),
-			sender: null,
-			time: "08:15:45",
-			status: "read",
-		},
-      ],
-    },
-    group: false,
-    pinned: true,
-    typing: false,
-  },
-];
+// const dummyUsers = [
+//   {
+//     id: 1,
+//     profile_picture: ppGirl3,
+//     name: "Love of my life ❤️💜",
+//     phone_number: "+2348123456789",
+//     whatsapp_name: "Beyonce",
+//     unread: 3,
+//     messages: {
+//       "04/06/2021": [
+//         {
+// 			content: getRandomSentence(),
+// 			sender: 8,
+// 			time: "08:11:26",
+// 			status: null,
+// 		},
+// 		{
+// 			content: getRandomSentence(),
+// 			sender: null,
+// 			time: "08:15:45",
+// 			status: "read",
+// 		},
+//       ],
+//     },
+//     group: false,
+//     pinned: true,
+//     typing: false,
+//   },
+// ];
 
-const users = [...dummyUsers];
+const users = [];
 
 // Function to fetch data from the API
 async function fetchUsersMessages() {
