@@ -71,7 +71,7 @@ const Chat = ({ match, history }) => {
   const submitNewMessage = () => {
     if (newMessage.trim()) {
       console.log("Submitting new message:", newMessage);
-      addNewMessage(user.id, newMessage);
+      addNewMessage(user.phone_number, newMessage);
       setNewMessage("");
       scrollToLastMsg();
     } else {
