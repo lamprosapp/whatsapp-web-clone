@@ -28,7 +28,7 @@ const UsersProvider = ({ children }) => {
     _updateUserProp(userId, "unread", 0);
   };
 
-  const addNewMessage = async (userId, message, media = null) => {
+  const addNewMessage = async (userId,phone_number, message, media = null) => {
     setUsersState((prevUsers) => {
       const updatedUsers = [...prevUsers];
       const userIndex = updatedUsers.findIndex((user) => user.id === userId);
@@ -50,7 +50,7 @@ const UsersProvider = ({ children }) => {
 
     try {
       const payload = {
-        to: userId,
+        to: phone_number,
         message,
         media,
       };
